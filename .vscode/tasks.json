@@ -1,0 +1,30 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: avr-gcc.exe arquivo de build ativo",
+            "command": "C:/Users/Lucas/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "-mmcu=atmega328p",
+                ""
+            ],
+            "options": {
+                "cwd": "C:/Users/Lucas/.platformio/packages/toolchain-atmelavr/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tarefa gerada pelo Depurador."
+        }
+    ],
+    "version": "2.0.0"
+}

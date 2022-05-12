@@ -15,6 +15,7 @@ int pin;
 int pin_status;
 String message = "";
 bool messageReady = false;
+bool teste = true;
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -65,14 +66,14 @@ void setDateTime() {
   // Only the date is needed for validating the certificates.
   configTime(TZ_Europe_Berlin, "pool.ntp.org", "time.nist.gov");
 
-  Serial.print("Waiting for NTP time sync: ");
+  // Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
   while (now < 8 * 3600 * 2) {
     delay(100);
-    Serial.print(".");
+    // Serial.print(".");
     now = time(nullptr);
   }
-  Serial.println();
+  // Serial.println();
 
   struct tm timeinfo;
   gmtime_r(&now, &timeinfo);
@@ -81,13 +82,13 @@ void setDateTime() {
 
 
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
+  // Serial.print("Message arrived [");
+  // Serial.print(topic);
+  // Serial.print("] ");
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
-  Serial.println();
+  // Serial.println();
 
   // Switch on the LED if the first character is present
   if ((char)payload[0] != NULL) {
@@ -105,20 +106,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   // Loop until we’re reconnected
   while (!client->connected()) {
-    Serial.print("Attempting MQTT connection…");
+    // Serial.print("Attempting MQTT connection…");
     String clientId = "ESP8266Client - MyClient";
     // Attempt to connect
     // Insert your password
-    if (client->connect(clientId.c_str(), "meuDispositivo", "240412Ab")) {
-      Serial.println("connected");
+    if (client->connect(clientId.c_str(), "testeWebsocket", "240412Ab")) {
+      // Serial.println("connected");
       // Once connected, publish an announcement…
       client->publish("testTopic", "hello world");
       // … and resubscribe
       client->subscribe("testTopic");
     } else {
-      Serial.print("failed, rc = ");
-      Serial.print(client->state());
-      Serial.println(" try again in 5 seconds");
+      // Serial.print("failed, rc = ");
+      // Serial.print(client->state());
+      // Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -142,9 +143,9 @@ void setup() {
   //espclient->setInsecure();
 
   int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
-  Serial.printf("Number of CA certs read: %d\n", numCerts);
+  // Serial.printf("Number of CA certs read: %d\n", numCerts);
   if (numCerts == 0) {
-    Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
+    // Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
     return; // Can't connect to anything w/o certs!
   }
 
@@ -191,18 +192,7 @@ void loop() {
       serializeJson(doc, Serial); //Send data to noPrincipalMesh
     }
     messageReady = false;
-
   }
 
   /////////////////////////////////////
-
-  unsigned long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    ++value;
-    snprintf (msg, MSG_BUFFER_SIZE, "hello world #%ld", value);
-    Serial.print("Publish message: ");
-    Serial.println(msg);
-    client->publish("testTopic", msg);
-  }
 }

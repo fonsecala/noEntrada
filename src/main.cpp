@@ -7,20 +7,6 @@
 #include <CertStoreBearSSL.h>
 #include <ArduinoJson.h>
 
-
-//Libraries added in second tutorial
-//Variable declarations
-int board;
-int pin;
-int pin_status;
-String message = "";
-bool messageReady = false;
-bool teste = true;
-
-/////////////////////////////////////////////////////////////////////////
-
-
-
 // Update these with values suitable for your network.
 const char* ssid = "nodemcu";
 const char* password = "zolami1234";
@@ -40,9 +26,6 @@ int value = 0;
 void setup_wifi() {
   delay(10);
   // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -53,11 +36,6 @@ void setup_wifi() {
   }
 
   randomSeed(micros());
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
 }
 
 
@@ -80,16 +58,14 @@ void setDateTime() {
   // Serial.printf("%s %s", tzname[0], asctime(&timeinfo));
 }
 
-
 void callback(char* topic, byte* payload, unsigned int length) {
-  // Serial.print("Message arrived [");
-  // Serial.print(topic);
-  // Serial.print("] ");
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+  char string[length];
+  for (unsigned int i = 0; i < length; i++) {
+    string[i] = (char)payload[i];
   }
-  // Serial.println();
-
+  string[length] = NULL;
+  //Redirecting message to noPrincipalMesh
+  Serial.print(string);
   // Switch on the LED if the first character is present
   if ((char)payload[0] != NULL) {
     digitalWrite(LED_BUILTIN, LOW); // Turn the LED on (Note that LOW is the voltage level
@@ -106,20 +82,23 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconnect() {
   // Loop until we’re reconnected
   while (!client->connected()) {
-    // Serial.print("Attempting MQTT connection…");
-    String clientId = "ESP8266Client - MyClient";
+    // Attempting MQTT connection…
+    String clientId = "noEntrada";
     // Attempt to connect
     // Insert your password
     if (client->connect(clientId.c_str(), "testeWebsocket", "240412Ab")) {
-      // Serial.println("connected");
-      // Once connected, publish an announcement…
-      client->publish("testTopic", "hello world");
+      // connected
+      // Once connected, blink twice to indicate it…
+      digitalWrite(LED_BUILTIN, LOW); 
+      delay(500);
+      digitalWrite(LED_BUILTIN, HIGH);
+      delay(500);
+      digitalWrite(LED_BUILTIN, LOW); 
+      delay(500);
+      digitalWrite(LED_BUILTIN, HIGH);
       // … and resubscribe
       client->subscribe("testTopic");
     } else {
-      // Serial.print("failed, rc = ");
-      // Serial.print(client->state());
-      // Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -129,7 +108,7 @@ void reconnect() {
 
 void setup() {
   delay(500);
-  // When opening the Serial Monitor, select 9600 Baud
+  // Initiating Serial, select 9600 Baud
   Serial.begin(9600);
   delay(500);
 
@@ -145,7 +124,7 @@ void setup() {
   int numCerts = certStore.initCertStore(LittleFS, PSTR("/certs.idx"), PSTR("/certs.ar"));
   // Serial.printf("Number of CA certs read: %d\n", numCerts);
   if (numCerts == 0) {
-    // Serial.printf("No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?\n");
+    // No certs found. Did you run certs-from-mozilla.py and upload the LittleFS directory before running?
     return; // Can't connect to anything w/o certs!
   }
 
@@ -164,35 +143,32 @@ void loop() {
     reconnect();
   }
   client->loop();
-  
-  ///////////////////////////////////
-  while (Serial.available())
-  {
-    message = Serial.readString();
-    messageReady = true;
-  }
-  //Only process message if there's one
-  if(messageReady){
-    //The only messsages we'll parse will be formatted in JSON
-    DynamicJsonDocument doc(1024);
-    //Attempt to deserialize the message
-    DeserializationError error = deserializeJson(doc, message);
-    if(error){
-      messageReady = false;
-      return;
-    }
-    //If request is received from noPrincipalMesh
-    if(doc["type"] == "request"){
-      //mensagem recebida
-      doc["type"] = "response";
-      //Get data from virtual pin
-      doc["board_status"] = board;
-      doc["led"] = pin;
-      doc["status"] = pin_status;
-      serializeJson(doc, Serial); //Send data to noPrincipalMesh
-    }
-    messageReady = false;
-  }
 
-  /////////////////////////////////////
+  // while (Serial.available())
+  // {
+  //   message = Serial.readString();
+  //   messageReady = true;
+  // }
+  // //Only process message if there's one
+  // if(messageReady){
+  //   //The only messsages we'll parse will be formatted in JSON
+  //   DynamicJsonDocument doc(1024);
+  //   //Attempt to deserialize the message
+  //   DeserializationError error = deserializeJson(doc, message);
+  //   if(error){
+  //     messageReady = false;
+  //     return;
+  //   }
+  //   //If request is received from noPrincipalMesh
+  //   if(doc["type"] == "request"){
+  //     //mensagem recebida
+  //     doc["type"] = "response";
+  //     //Get data from virtual pin
+  //     doc["board_status"] = board;
+  //     doc["led"] = pin;
+  //     doc["status"] = pin_status;
+  //     serializeJson(doc, Serial); //Send data to noPrincipalMesh
+  //   }
+  //   messageReady = false;
+  // }
 }

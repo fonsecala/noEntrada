@@ -1,0 +1,17 @@
+[33mcommit 6a0bfe91997d8ef9033140af3520518a301d8ec3[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m)[m
+Author: Lucas Fonseca <lucasafeng@gmail.com>
+Date:   Mon May 16 17:27:22 2022 -0300
+
+    Estrutura de envio de mensagem de noEntrada para noPrincipalMesh
+
+[33mcommit f4b79aee3ce9de81a9e21999735803851c1de9bb[m[33m ([m[1;31morigin/master[m[33m)[m
+Author: Lucas Fonseca <lucasafeng@gmail.com>
+Date:   Thu May 12 17:52:30 2022 -0300
+
+    veridifaSerial
+
+[33mcommit 841c9ca3742ccd44887485c477cbb0b5502e17c9[m[33m ([m[1;32mremote[m[33m)[m
+Author: Lucas Fonseca <lucasafeng@gmail.com>
+Date:   Thu May 12 13:50:43 2022 -0300
+
+    'firstCommit'

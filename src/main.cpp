@@ -6,10 +6,11 @@
 #include <LittleFS.h>
 #include <CertStoreBearSSL.h>
 #include <ArduinoJson.h>
+#include <string.h>
 
 // Update these with values suitable for your network.
-const char* ssid = "nodemcu";
-const char* password = "zolami1234";
+const char* ssid = "hsNCE";
+const char* password = "";
 const char* mqtt_server = "d37d3fa91de340a69dc9ce989bf5798b.s1.eu.hivemq.cloud";
 
 // A single, global CertStore which can be used by all connections.
@@ -21,7 +22,10 @@ PubSubClient * client;
 unsigned long lastMsg = 0;
 #define MSG_BUFFER_SIZE (500)
 char msg[MSG_BUFFER_SIZE];
-int value = 0;
+String message;
+bool messageReady = false;
+
+// const char mychar[11] = "outro"; //Teste topico para debug
 
 void setup_wifi() {
   delay(10);
@@ -61,11 +65,11 @@ void setDateTime() {
 void callback(char* topic, byte* payload, unsigned int length) {
   char string[length];
   for (unsigned int i = 0; i < length; i++) {
-    string[i] = (char)payload[i];
+    string[i] = (char)payload[i]; 
   }
-  string[length] = NULL;
-  //Redirecting message to noPrincipalMesh
-  Serial.print(string);
+  string[length] = NULL; //Determina o fim da variável pois o payload não acompanha sinalizador
+  Serial.println(string);
+
   // Switch on the LED if the first character is present
   if ((char)payload[0] != NULL) {
     digitalWrite(LED_BUILTIN, LOW); // Turn the LED on (Note that LOW is the voltage level
@@ -108,8 +112,8 @@ void reconnect() {
 
 void setup() {
   delay(500);
-  // Initiating Serial, select 9600 Baud
-  Serial.begin(9600);
+  // Initiating Serial, select 115200 Baud
+  Serial.begin(115200);
   delay(500);
 
   LittleFS.begin();
@@ -144,31 +148,21 @@ void loop() {
   }
   client->loop();
 
-  // while (Serial.available())
-  // {
-  //   message = Serial.readString();
-  //   messageReady = true;
-  // }
-  // //Only process message if there's one
-  // if(messageReady){
-  //   //The only messsages we'll parse will be formatted in JSON
-  //   DynamicJsonDocument doc(1024);
-  //   //Attempt to deserialize the message
-  //   DeserializationError error = deserializeJson(doc, message);
-  //   if(error){
-  //     messageReady = false;
-  //     return;
-  //   }
-  //   //If request is received from noPrincipalMesh
-  //   if(doc["type"] == "request"){
-  //     //mensagem recebida
-  //     doc["type"] = "response";
-  //     //Get data from virtual pin
-  //     doc["board_status"] = board;
-  //     doc["led"] = pin;
-  //     doc["status"] = pin_status;
-  //     serializeJson(doc, Serial); //Send data to noPrincipalMesh
-  //   }
-  //   messageReady = false;
-  // }
+  while (Serial.available())
+  {
+    message = Serial.readString();
+    messageReady = true;
+  }
+  
+  if(messageReady)
+  {
+    // O codigo presente aqui foi utilizado somente para debug. Futuro codigo deverá prever comunicação no sentido noPrincipalMesh --> broker mqtt
+    // client->publish(mychar, &message[0]);
+    messageReady = false;
+    
+  }
 }
+
+// Estrutura a ser adotada no envio de mensagem por Mqtt
+// {"sensor":"garota","time":1351824120,"data":[48.756080,2.302038]}
+// {'type':'garota', 'time': 1030, 'data':[48.35,50.96]}  ---> Ultimo utilizado no HiveMq

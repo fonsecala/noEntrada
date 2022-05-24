@@ -108,8 +108,8 @@ void reconnect() {
 
 void setup() {
   delay(500);
-  // Initiating Serial, select 9600 Baud
-  Serial.begin(9600);
+  // Initiating Serial, select 115200 Baud
+  Serial.begin(115200);
   delay(500);
 
   LittleFS.begin();
